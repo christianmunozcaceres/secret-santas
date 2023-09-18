@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String           @id @default(uuid())
+  name                  String           @unique
+  email                 String
+  christmasGroups       ChristmasGroup[]
+  givingSecretSantas    SecretSanta[]    @relation(name: "giver")
+  receivingSecretSantas SecretSanta[]    @relation(name: "receiver")
+}
+
+model ChristmasGroup {
+  id           String        @id @default(uuid())
+  year         Int
+  title        String
+  participants User[]
+  SecretSanta  SecretSanta[]
+}
+
+model SecretSanta {
+  id               String         @id @default(uuid())
+  christmasGroup   ChristmasGroup @relation(fields: [christmasGroupId], references: [id])
+  christmasGroupId String
+  giver            User           @relation(fields: [giverId], references: [id], name: "giver")
+  giverId          String
+  receiver         User           @relation(fields: [receiverId], references: [id], name: "receiver")
+  receiverId       String
+}
